@@ -51,13 +51,13 @@ def search(name_search_pattern, prop_search_pattern, token):
         #print "hello"
 
 
-        start = time.clock()
+        start = time.time()
         query_result = db.property_vals.find({"$and" :[{ "channel" : { "$regex" : name_search_pattern}},{"name":prop_search_pattern[0]},{"value":prop_search_pattern[1]}]})
         ls = []
         for ch in query_result:
             ls = ls + [ db.channels.find({"name":ch["channel"]})[0] ]
 
-        end = time.clock()
+        end = time.time()
 
 
         #print query_result.explain()
