@@ -2,6 +2,7 @@ from random import shuffle, randint
 
 import time
 import collections
+import monotonic
 from matplotlib import pyplot
 from pymongo import MongoClient
 global result_temp
@@ -9,7 +10,7 @@ global result_temp
 client = MongoClient('localhost',27017)
 
 #make DB
-db=client.insert_embedded_2
+db=client.insert_embedded
 
 
 def generate_token_bucket(val_bucket, size=1):
@@ -50,7 +51,9 @@ def search(name_search_pattern, prop_search_pattern, token):
         global result_temp
         #print "hello"
 
-        start = time.time()
+        #start = time.time()
+        #start = monotonic.monotonic_time()
+
         query_result = db.channels.find(
             {
                 "$and": [
@@ -68,23 +71,25 @@ def search(name_search_pattern, prop_search_pattern, token):
                     }   }
                 ]
             })
-        end = time.time()
+        #end = time.time()
+        #end = monotonic.monotonic_time()
 
 
         #print query_result.explain()
+        millis = query_result.explain()["millis"]
         #print query_result.count()
         #print name_search_pattern  ##"SR:C001-PS:2{DP}OK-St"
         #print prop_search_pattern
         #print "time:  "+str((end-start))
-        f.write(''.join([name_search_pattern, str(prop_search_pattern), str((end - start) * 1000), '\n']))
+        f.write(''.join([name_search_pattern, str(prop_search_pattern), str((millis) * 1000), '\n']))
         #print "token = "+ token
         if(query_result.count() == int(token)):
             if int(token) in result_temp.keys():
                 #print "result_temp append"
-                result_temp.get(int(token)).append(end - start)
+                result_temp.get(int(token)).append(millis)
             else:
                 #print "result_temp enter"
-                result_temp[int(token)] = [end - start]
+                result_temp[int(token)] = [millis]
         #print
        # print result_temp
         f.write(str(result_temp) +'\n')

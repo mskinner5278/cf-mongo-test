@@ -5,7 +5,7 @@ from pymongo import MongoClient
 client = MongoClient('localhost',27017)
 
 #make DB
-db=client.insert_embedded_2
+db=client.insert_embedded
 
 max_prop = 40 # must be >=20
 max_tag = 60 # must be >=11
@@ -22,8 +22,11 @@ tokens = []
 val_bucket = ['0','1','2','5','10','20','50','100','200','500']
 prop_list = []
 tag_list = []
+fake_prop_list = []
+real_prop_list = []
 
 def clean_channels():
+    #db.channels.drop_indexes()
     db.tags.remove()
     db.channels.remove()
     db.property.remove()
@@ -61,7 +64,7 @@ def insert_tag(channel,name, owner):
     #########################db.prop_vals
 
 def insert_bunch(count, prefix, midfix, postfix, location, cell, element, device, unit, sigtype):
-    global chan_in_cell, buckets, val_bucket, full_buckets, prop_list, tag_list
+    global chan_in_cell, buckets, val_bucket, full_buckets, prop_list, tag_list, real_prop_list
     prop_list = []
     tag_list = []
     if (count > 9):
@@ -253,8 +256,7 @@ def insert_bunch(count, prefix, midfix, postfix, location, cell, element, device
             insert_tag(cid,"tagone",towner)
         #print len(prop_list)
 
-
-        db.channels.update({"name":cid}, {"$set": { "properties":prop_list }} )
+        db.channels.update({"name":cid}, {"$set": { "properties": (prop_list+real_prop_list) }} )
         db.channels.update({"name":cid}, {"$set": { "tags":tag_list}} )
 
 
@@ -398,7 +400,19 @@ def insert_bo_cell(cell):
 
 
 def create_db():
+    global fake_prop_list, real_prop_list
     clean_channels()
+
+    for i in range (10,70):
+        fake_prop = {'owner': 'prop_owner'+str(i%10), 'prop_val': i, 'name': 'prop'+str(i)}
+        db.properties.insert(fake_prop)
+        fake_prop_list = fake_prop_list + [fake_prop]
+
+    for fake_prop in fake_prop_list:
+        real_prop = db.properties.find({"name":fake_prop['name']}).next()
+        real_prop_list = real_prop_list + [real_prop]
+
+
     #1000 channels per sr cell
     for n in range (1,101):#101
         print str(time.time())+" : sr_cell " + str(n)
