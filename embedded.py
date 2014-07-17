@@ -1,3 +1,5 @@
+Remove me to run. I prevent accidents.
+
 import sys, random, time
 from pymongo import MongoClient
 
@@ -5,7 +7,7 @@ from pymongo import MongoClient
 client = MongoClient('localhost',27017)
 
 #make DB
-db=client.insert_embedded
+db=client.insert_embedded_3
 
 max_prop = 40 # must be >=20
 max_tag = 60 # must be >=11

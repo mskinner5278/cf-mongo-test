@@ -1,11 +1,11 @@
-import sys, random
+import sys, random, time
 from pymongo import MongoClient
 
 #connect with client
 client = MongoClient('localhost',27017)
 
 #make DB
-db=client.insert_normalized
+db=client.insert_normalized_1
 
 max_prop = 40 # must be >=20
 max_tag = 60 # must be >=11
@@ -22,7 +22,7 @@ tokens = []
 val_bucket = ['0','1','2','5','10','20','50','100','200','500']
 prop_list = []
 tag_list = []
-BLOCKER
+
 def clean_channels():
     db.tags.remove()
     db.channels.remove()
@@ -255,6 +255,9 @@ def insert_bunch(count, prefix, midfix, postfix, location, cell, element, device
             insert_tag(cid,"tagone",towner)
         #print prop_list
 
+        for i in range(10,70):
+            insert_property(cid, "prop"+str(i), powner, i)
+
 
         db.channels.update({"name":cid}, {"$set": { "properties":prop_list }} )
         db.channels.update({"name":cid}, {"$set": { "tags":tag_list}} )
@@ -403,10 +406,14 @@ def insert_bo_cell(cell):
 def create_db():
     clean_channels()
     #1000 channels per sr cell
+    previous = time.time()
+    timer = 0
     for n in range (1,101):
-        print "sr_cell " +str(n)
         cell = 'n'.zfill(3)
         insert_sr_cell(n)
+        timer = time.time()
+        print "sr_cell " +str(n) +"  ("+str(timer-previous)+" seconds)"
+        previous = timer
 
     #500 channels per bo cell
     for n in range (1,101):

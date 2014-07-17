@@ -10,7 +10,7 @@ global result_temp
 client = MongoClient('localhost',27017)
 
 #make DB
-db=client.insert_embedded
+db=client.insert_embedded_3
 
 
 def generate_token_bucket(val_bucket, size=1):
@@ -81,7 +81,7 @@ def search(name_search_pattern, prop_search_pattern, token):
         #print name_search_pattern  ##"SR:C001-PS:2{DP}OK-St"
         #print prop_search_pattern
         #print "time:  "+str((end-start))
-        f.write(''.join([name_search_pattern, str(prop_search_pattern), str((millis) * 1000), '\n']))
+      #  f.write(''.join([name_search_pattern, str(prop_search_pattern), str((millis) * 1000), '\n']))
         #print "token = "+ token
         if(query_result.count() == int(token)):
             if int(token) in result_temp.keys():
@@ -92,7 +92,7 @@ def search(name_search_pattern, prop_search_pattern, token):
                 result_temp[int(token)] = [millis]
         #print
        # print result_temp
-        f.write(str(result_temp) +'\n')
+     #   f.write(str(result_temp) +'\n')
 
 
 
@@ -123,6 +123,7 @@ if __name__ == '__main__':
         search(name_search_pattern, prop_search_pattern, token)
 
     result=result_temp
+    f.write(str(result) +'\n')
     generate_plot('Performance regular search', result)
     #print "RESULT "
     #print result
@@ -141,7 +142,9 @@ if __name__ == '__main__':
         prop_search_pattern = ['group'+str(randint(0,5)),token]
         search(name_search_pattern,prop_search_pattern, token)
 
-        result_rand=result_temp
+    result_rand=result_temp
+
+    f.write(str(result_rand) +'\n')
     generate_plot('Performance for random set of channels', result_rand)
     #print result_rand
 
@@ -155,6 +158,7 @@ if __name__ == '__main__':
         prop_search_pattern = ['group'+str(randint(6,9)),token]
         search(name_search_pattern,prop_search_pattern, token)
     result_ordered=result_temp
+    f.write(str(result_ordered) +'\n')
     generate_plot('Performance for ordered set of channels', result_ordered)
     #print result_ordered
 
